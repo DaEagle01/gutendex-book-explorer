@@ -1,5 +1,6 @@
 const API_URL = 'https://gutendex.com/books';
 let currentPage = 1;
+let totalPages = 1;
 let booksData = [];
 let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
 
@@ -8,7 +9,7 @@ const genreFilter = document.getElementById('genre-filter');
 const booksContainer = document.getElementById('books-container');
 const prevPageBtn = document.getElementById('prev-page');
 const nextPageBtn = document.getElementById('next-page');
-const currentPageSpan = document.getElementById('current-page');
+const pageNumbers = document.getElementById('page-numbers');
 const loadingSkeleton = document.getElementById('loading-skeleton');
 const errorMessage = document.getElementById('error-message');
 
@@ -23,8 +24,10 @@ async function fetchBooks(page = 1, search = '') {
         }
         const data = await response.json();
         booksData = data.results;
+        totalPages = Math.ceil(data.count / 32); // 32 is the default page size
         updateGenreFilter();
         displayBooks();
+        updatePagination();
     } catch (error) {
         console.error('Error fetching books:', error);
         showErrorMessage('Failed to fetch books. Please try again later.');
@@ -47,11 +50,14 @@ function displayBooks() {
 function createBookCard(book) {
     const card = document.createElement('div');
     card.className = 'book-card';
+
+    // title, author, cover image, genre and id.
     card.innerHTML = `
         <img src="${book.formats['image/jpeg']}" alt="${book.title}">
         <h3><a href="book-details.html?id=${book.id}">${book.title}</a></h3>
-        <p>${book.authors.map(author => author.name).join(', ')}</p>
+        <p class='author-name'>${book.authors.map(author => author.name).join(', ')}</p>
         <p>ID: ${book.id}</p>
+        <p>Genre: ${book.bookshelves ? `${book.bookshelves.slice(0, 3).join(', ')}${book.bookshelves?.length > 3 ? `...` : ""}` : 'Unknown'}</p>
         <button class="wishlist-toggle" data-id="${book.id}">
             ${wishlist.includes(book.id) ? '❤️' : '🤍'}
         </button>
@@ -67,9 +73,11 @@ function toggleWishlist(e) {
     if (index === -1) {
         wishlist.push(bookId);
         e.target.textContent = '❤️';
+        e.target.classList.add('wishlist-added');
     } else {
         wishlist.splice(index, 1);
         e.target.textContent = '🤍';
+        e.target.classList.remove('wishlist-added');
     }
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
 }
@@ -87,6 +95,30 @@ function updateGenreFilter() {
         option.textContent = genre;
         genreFilter.appendChild(option);
     });
+}
+
+// Update pagination
+function updatePagination() {
+    pageNumbers.innerHTML = '';
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+
+    for (let i = startPage; i <= endPage; i++) {
+        const pageNumber = document.createElement('span');
+        pageNumber.textContent = i;
+        pageNumber.className = 'page-number';
+        if (i === currentPage) {
+            pageNumber.classList.add('active');
+        }
+        pageNumber.addEventListener('click', () => {
+            currentPage = i;
+            fetchBooks(currentPage, searchInput.value);
+        });
+        pageNumbers.appendChild(pageNumber);
+    }
+
+    prevPageBtn.disabled = currentPage === 1;
+    nextPageBtn.disabled = currentPage === totalPages;
 }
 
 // Show loading skeleton
@@ -138,14 +170,14 @@ prevPageBtn.addEventListener('click', () => {
     if (currentPage > 1) {
         currentPage--;
         fetchBooks(currentPage, searchInput.value);
-        currentPageSpan.textContent = currentPage;
     }
 });
 
 nextPageBtn.addEventListener('click', () => {
-    currentPage++;
-    fetchBooks(currentPage, searchInput.value);
-    currentPageSpan.textContent = currentPage;
+    if (currentPage < totalPages) {
+        currentPage++;
+        fetchBooks(currentPage, searchInput.value);
+    }
 });
 
 // Debounce function

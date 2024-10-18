@@ -1,26 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wishlist - Gutendex Book Explorer</title>
     <link rel="stylesheet" href="/styles/styles.css" />
-  </head>
-  <body>
-    <header>
-      <nav>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="wishlist.html" class="active">Wishlist</a></li>
-        </ul>
-      </nav>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <h1 class="site-title">Gutendex Book Explorer</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="wishlist.html" class="active">Wishlist</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
 
     <main>
-      <h1>Your Wishlist</h1>
-      <div id="wishlist-container"></div>
+        <h2>Your Wishlist</h2>
+        <div id="loading-skeleton" class="loading-skeleton">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+        </div>
+        <div id="error-message" class="error-message"></div>
+        <div id="wishlist-container"></div>
     </main>
 
     <script src="/scripts/wishlist.js"></script>
-  </body>
+</body>
 </html>

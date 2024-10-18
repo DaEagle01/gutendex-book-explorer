@@ -7,17 +7,19 @@
     <link rel="stylesheet" href="/styles/styles.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="index.html" class="active">Home</a></li>
-                <li><a href="/wishlist.html">Wishlist</a></li>
-            </ul>
-        </nav>
+    <header class="site-header">
+        <div class="header-content">
+            <h1 class="site-title">Gutendex Book Explorer</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="wishlist.html">Wishlist</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
 
     <main>
-        <h1>Gutendex Book Explorer</h1>
         <div class="controls">
             <input type="text" id="search" placeholder="Search books...">
             <select id="genre-filter">
@@ -35,9 +37,9 @@
         <div id="error-message" class="error-message"></div>
         <div id="books-container"></div>
         <div class="pagination">
-            <button id="prev-page">Previous</button>
-            <span id="current-page">1</span>
-            <button id="next-page">Next</button>
+            <button id="prev-page" class="page-button">Previous</button>
+            <div id="page-numbers"></div>
+            <button id="next-page" class="page-button">Next</button>
         </div>
     </main>
 

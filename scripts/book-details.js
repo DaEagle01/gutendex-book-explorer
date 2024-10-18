@@ -74,9 +74,11 @@ function toggleWishlist(bookId) {
     if (index === -1) {
         wishlist.push(bookId);
         wishlistToggle.textContent = '❤️ Remove from Wishlist';
+        wishlistToggle.classList.add('wishlist-added');
     } else {
         wishlist.splice(index, 1);
         wishlistToggle.textContent = '🤍 Add to Wishlist';
+        wishlistToggle.classList.remove('wishlist-added');
     }
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
 }
