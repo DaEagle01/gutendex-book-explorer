@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Details - Gutendex Book Explorer</title>
+    <link rel="stylesheet" href="/styles/styles.css" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="wishlist.html">Wishlist</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <div id="loading-skeleton" class="loading-skeleton">
+        <div class="skeleton-card"></div>
+      </div>
+      <div id="error-message" class="error-message"></div>
+      <div id="book-details" class="book-details">
+        <h1 id="book-title"></h1>
+        <div class="book-content">
+          <div class="book-image">
+            <img id="book-cover" src="" alt="Book cover" />
+          </div>
+          <div class="book-info">
+            <p><strong>Author(s):</strong> <span id="book-authors"></span></p>
+            <p><strong>Genres:</strong> <span id="book-genres"></span></p>
+            <p>
+              <strong>Download count:</strong> <span id="book-downloads"></span>
+            </p>
+            <p><strong>Languages:</strong> <span id="book-languages"></span></p>
+            <p><strong>Copyright:</strong> <span id="book-copyright"></span></p>
+            <button id="wishlist-toggle" class="wishlist-toggle"></button>
+          </div>
+        </div>
+        <div class="book-description">
+          <h2>Description</h2>
+          <p id="book-description"></p>
+        </div>
+        <div class="book-links">
+          <h2>Download Links</h2>
+          <ul id="book-download-links"></ul>
+        </div>
+      </div>
+    </main>
+
+    <script src="book-details.js"></script>
+  </body>
+</html>
