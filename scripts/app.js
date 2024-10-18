@@ -14,7 +14,7 @@ const loadingSkeleton = document.getElementById('loading-skeleton');
 const errorMessage = document.getElementById('error-message');
 
 // Fetch books data
-async function fetchBooks(page = 1, search = '') {
+async function fetchBooks(page = 1, search = '', genre = '') {
     showLoadingSkeleton();
     hideErrorMessage();
     try {
@@ -26,7 +26,11 @@ async function fetchBooks(page = 1, search = '') {
         booksData = data.results;
         totalPages = Math.ceil(data.count / 32); // 32 is the default page size
         updateGenreFilter();
-        displayBooks();
+        if (genre) {
+            filterBooksByGenre(genre);
+        } else {
+            displayBooks();
+        }
         updatePagination();
     } catch (error) {
         console.error('Error fetching books:', error);
@@ -53,7 +57,7 @@ function createBookCard(book) {
 
     // title, author, cover image, genre and id.
     card.innerHTML = `
-        <img src="${book.formats['image/jpeg']}" alt="${book.title}">
+        <img src="${book.formats['image/jpeg']}" alt="${book.title}" loading="lazy">
         <h3><a href="book-details.html?id=${book.id}">${book.title}</a></h3>
         <p class='author-name'>${book.authors.map(author => author.name).join(', ')}</p>
         <p>ID: ${book.id}</p>
@@ -88,12 +92,35 @@ function updateGenreFilter() {
     booksData.forEach(book => {
         book.bookshelves.forEach(genre => genres.add(genre));
     });
+    const currentGenre = genreFilter.value;
     genreFilter.innerHTML = '<option value="">All Genres</option>';
     genres.forEach(genre => {
         const option = document.createElement('option');
         option.value = genre;
         option.textContent = genre;
+        if (genre === currentGenre) {
+            option.selected = true;
+        }
         genreFilter.appendChild(option);
+    });
+
+    const savedGenre = localStorage.getItem('savedGenre');
+    if (savedGenre) {
+        genreFilter.value = savedGenre;
+    }
+}
+
+// Filter books by genre
+function filterBooksByGenre(genre) {
+    const filteredBooks = genre
+        ? booksData.filter(book => book.bookshelves.includes(genre))
+        : booksData;
+
+    booksContainer.innerHTML = '';
+    filteredBooks.forEach((book, index) => {
+        const bookCard = createBookCard(book);
+        booksContainer.appendChild(bookCard);
+        setTimeout(() => bookCard.classList.add('visible'), 50 * index);
     });
 }
 
@@ -148,36 +175,27 @@ function hideErrorMessage() {
 // Event listeners
 searchInput.addEventListener('input', debounce(() => {
     currentPage = 1;
-    fetchBooks(currentPage, searchInput.value);
+    fetchBooks(currentPage, searchInput.value, genreFilter.value);
 }, 300));
 
 genreFilter.addEventListener('change', () => {
     const selectedGenre = genreFilter.value;
-    if (selectedGenre) {
-        booksContainer.innerHTML = '';
-        booksData.filter(book => book.bookshelves.includes(selectedGenre))
-            .forEach((book, index) => {
-                const bookCard = createBookCard(book);
-                booksContainer.appendChild(bookCard);
-                setTimeout(() => bookCard.classList.add('visible'), 50 * index);
-            });
-    } else {
-        displayBooks();
-    }
+    localStorage.setItem('savedGenre', selectedGenre);
+    filterBooksByGenre(selectedGenre);
 });
 
 prevPageBtn.addEventListener('click', () => {
     if (currentPage > 1) {
         currentPage--;
-        fetchBooks(currentPage, searchInput.value);
+        fetchBooks(currentPage, searchInput.value, genreFilter.value);
     }
 });
 
 nextPageBtn.addEventListener('click', () => {
     if (currentPage < totalPages) {
         currentPage++;
-        fetchBooks(currentPage, searchInput.value);
     }
+    fetchBooks(currentPage, searchInput.value, genreFilter.value);
 });
 
 // Debounce function
@@ -189,20 +207,17 @@ function debounce(func, delay) {
     };
 }
 
-// Initial fetch
-fetchBooks();
-
 // Load preferences from localStorage
 window.addEventListener('load', () => {
     const savedSearch = localStorage.getItem('savedSearch');
     const savedGenre = localStorage.getItem('savedGenre');
     if (savedSearch) {
         searchInput.value = savedSearch;
-        fetchBooks(currentPage, savedSearch);
     }
     if (savedGenre) {
         genreFilter.value = savedGenre;
     }
+    fetchBooks(currentPage, savedSearch, savedGenre);
 });
 
 // Save preferences to localStorage
